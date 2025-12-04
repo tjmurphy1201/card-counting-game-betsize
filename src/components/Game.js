@@ -1,14 +1,39 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import Footer from './Footer'
 import Header from './Header'
 
+const BET_UNIT = 100 // change this to your preferred betting unit
 
 const Game = ({ game, actions }) => {
   const { shoe, idx, rand, count, is_visible } = game
   const idxEnd = idx + rand
   const cards = shoe.slice(idx, idxEnd)
   const isOver = idxEnd >= shoe.length
+
+  const [showBetSizing, setShowBetSizing] = useState(false)
+
+  // --- Bet sizing logic ---
+
+  // Approximate decks remaining based on cards left in the shoe
+  const cardsRemaining = Math.max(shoe.length - idxEnd, 0)
+  const decksRemaining = cardsRemaining > 0 ? cardsRemaining / 52 : 0
+
+  const rawTrueCount = decksRemaining > 0 ? count / decksRemaining : 0
+
+  // Floor toward zero but keep sign (for completeness)
+  let trueCount
+  if (rawTrueCount > 0) {
+    trueCount = Math.floor(rawTrueCount)
+  } else {
+    trueCount = Math.ceil(rawTrueCount)
+  }
+
+  // Units = true count - 1 (never below 0)
+  const unitsToBet = Math.max(trueCount - 1, 0)
+
+  const perHandBetTwoHands = unitsToBet * BET_UNIT
+  const singleHandBet = Math.round(perHandBetTwoHands * 1.25)
 
   return (
     <div className='p3 mx-auto' style={{ maxWidth: 600 }}>
@@ -32,10 +57,44 @@ const Game = ({ game, actions }) => {
         >
           {is_visible ? 'Hide' : 'Show'} running count
         </button>
-        {is_visible &&
-          <span className='ml2 h3 bold align-middle'>{count}</span>
-        }
+
+        {is_visible && (
+          <>
+            <span className='ml2 h3 bold align-middle'>{count}</span>
+
+            <button
+              className='btn btn-primary bg-black ml2'
+              onClick={() => setShowBetSizing(!showBetSizing)}
+            >
+              {showBetSizing ? 'Hide bet sizes' : 'Show bet sizes'}
+            </button>
+          </>
+        )}
       </div>
+
+      {is_visible && showBetSizing && (
+        <div className='mb3'>
+          <p className='h5 mb1'>
+            Approx. true count: {trueCount}
+          </p>
+          <p className='h5 mb1'>
+            Units to bet (TC - 1): {unitsToBet}
+          </p>
+          <p className='h5 mb1'>
+            Two hands (adjacent spots):{' '}
+            {perHandBetTwoHands > 0
+              ? `$${perHandBetTwoHands} per hand`
+              : 'Minimum bet only'}
+          </p>
+          <p className='h5'>
+            One hand only (25% more):{' '}
+            {singleHandBet > 0
+              ? `$${singleHandBet} on one hand`
+              : 'Minimum bet only'}
+          </p>
+        </div>
+      )}
+
       <div className='mb2'>
         <button
           className='btn btn-primary bg-black mr2'
