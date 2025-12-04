@@ -1,7 +1,7 @@
 {
   "name": "card-counting-game",
   "version": "0.1.0",
-  "homepage": "https://brendansudol.github.io/card-counting-game",
+  "homepage": "https://tjmurphy1201.github.io/card-counting-game",
   "private": true,
   "devDependencies": {
     "gh-pages": "^0.12.0",
