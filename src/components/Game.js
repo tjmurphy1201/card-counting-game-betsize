@@ -59,7 +59,7 @@ const Game = ({ game, actions }) => {
         </button>
 
         {is_visible && (
-          <>
+          <div style={{ display: 'inline-block' }}>
             <span className='ml2 h3 bold align-middle'>{count}</span>
 
             <button
@@ -68,7 +68,7 @@ const Game = ({ game, actions }) => {
             >
               {showBetSizing ? 'Hide bet sizes' : 'Show bet sizes'}
             </button>
-          </>
+          </div>
         )}
       </div>
 
